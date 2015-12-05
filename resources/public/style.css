@@ -1,0 +1,93 @@
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+html, textarea, button {
+  font: 12px/20px Consolas, 'Menlo', monospace;
+}
+
+body {
+	margin: 0; padding: 0;
+}
+
+.toolbar {
+	background-color: rgba(128,128,128,.05);
+}
+
+.toolbar .logo {
+	display: inline-block;
+ 	font-family: Helvetica, Arial;
+
+	margin-right: 0rem;
+	margin-left: 1rem;
+
+	font-size: 1.75rem;
+	font-variant: small-caps;
+
+	line-height: 133%;
+	vertical-align: middle;
+
+	letter-spacing: .25rem;
+}
+
+.toolbar ul {
+	display: inline-block;
+
+	margin-left: 20%;
+	width: 50%;
+
+	padding-left: 0;
+}
+
+
+.toolbar ul li {
+	display: inline-block;
+	vertical-align: middle;
+
+	padding-left: .25rem;
+
+}
+
+.toolbar button {
+	font-size: .9rem;
+	padding: .1rem .5rem;
+
+}
+
+.search {
+	min-height: 3rem; 
+
+	width: 350px; /* how to fill width ? */
+}
+
+.app {
+	line-height: 175%;
+	padding: 2%;
+}
+
+.app .header {
+	display: inline-block;
+	border-bottom: 1px solid rgba(128,128,128,0.25); 
+	margin-bottom: .5rem;
+}
+
+.app .link {
+	margin-left: 1rem;
+}
+
+.app .link .status {
+	margin-left: .25rem;
+	font-size: 75%;
+	vertical-align: middle;
+}
+
+.app .link .status:before {
+	content: '(';
+}
+
+.app .link .status:after {
+	content: ')';
+}

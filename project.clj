@@ -7,6 +7,9 @@
     [compojure                  "1.4.0" :exclusions [commos-codec]]
     [com.cognitect/transit-clj  "0.8.285"]
     [com.cognitect/transit-cljs "0.8.232"]
+
+    [datascript "0.13.0"]
+    [datascript-transit "0.2.0"]
   ]
   
   :plugins [

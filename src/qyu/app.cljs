@@ -7,6 +7,32 @@
 (enable-console-print!)
 
 
+
+(defonce conn (atom {})) 
+
+(rum/defc aaa [db]
+  [:.container 
+    [:.toolbar
+      [:.logo "qyu"]
+
+
+      [:ul 
+        [:li [:input.search {:type "search"}] ]
+        [:li [:button "?"]]
+        ]
+
+    ]
+    [:.app
+      
+      [:.links
+        [:.header "Today"]
+        [:.link 
+          [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
+      ]
+    ]]
+)
+
+
 (defn read-transit-str [s]
   (t/read (t/reader :json) s))
 
@@ -38,11 +64,37 @@
     (.send socket (write-transit-str message))))
 
 
+(defonce conn (atom {})) ;; 
+
 (rum/defc app < rum/reactive []
   (let [state (rum/react *state)]
-    [:div "[" (:count state) "] " (pr-str (:message state)) ]))
+  [:.container 
+    [:.toolbar
+      [:.logo "qyu"]
+
+      [:ul 
+        [:li [:input.search {:type "search"}] ]
+        [:li [:button "?"]]
+        ]
+    ]
+
+    [:.app
+      [:.links
+        [:.header "Today"]
+        [:.link 
+          [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
+      ]
+
+  ;;   
+     [:hr] 
+      [:div "[" (:count state) "] " (pr-str (:message state)) ]
+
+
+    ]])
+)
 
 
 (defn ^:export refresh []
   (send! "refreshed")
   (rum/mount (app) (js/document.querySelector "#app")))
+
