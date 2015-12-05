@@ -49,18 +49,30 @@ body {
 
 	padding-left: .25rem;
 
+
 }
 
 .toolbar button {
 	font-size: .9rem;
 	padding: .1rem .5rem;
 
+	background: #fff;
+	border: 1px solid rgba(128,128,128,0.5);
+}
+
+.toolbar button:hover {
+	color: #fff;
+	background-color: #000;
 }
 
 .search {
+	width: 90%;
+}
+
+.search input {
 	min-height: 3rem; 
 
-	width: 350px; /* how to fill width ? */
+    width: 100%;
 }
 
 .app {
@@ -71,6 +83,9 @@ body {
 .app .header {
 	display: inline-block;
 	border-bottom: 1px solid rgba(128,128,128,0.25); 
+
+	padding-bottom: 3px;
+
 	margin-bottom: .5rem;
 }
 

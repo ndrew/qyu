@@ -1,10 +1,21 @@
 (ns qyu.app
   (:require
     [rum.core :as rum]
-    [cognitect.transit :as t]))
+    [cognitect.transit :as t]
+
+    [qyu.keys :as keys]
+    ))
+
 
 
 (enable-console-print!)
+
+
+(keys/register "ctrl+enter" #(print "HELP!"))
+
+
+
+
 
 
 
@@ -73,7 +84,7 @@
       [:.logo "qyu"]
 
       [:ul 
-        [:li [:input.search {:type "search"}] ]
+        [:li.search [:input {:type "search"}]]
         [:li [:button "?"]]
         ]
     ]
