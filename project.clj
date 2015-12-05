@@ -20,7 +20,7 @@
   :aliases      { "package" ["do" 
                              "cljsbuild" "once" "advanced,"
                              "uberjar"] }
-  :aot          [ skeleton.server ]
+  :aot          [ qyu.server ]
   :uberjar-name "qyu.jar"
   :uberjar-exclusions [#"public/js/out"]
 
