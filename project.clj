@@ -1,5 +1,5 @@
 (defproject qyu "0.1.0-SNAPSHOT"
-  :dependencies [ 
+  :dependencies [
     [org.clojure/clojure        "1.7.0"]
     [org.clojure/clojurescript  "1.7.189"]
     [rum                        "0.6.0"]
@@ -10,35 +10,34 @@
 
     [datascript "0.13.0"]
     [datascript-transit "0.2.0"]
+
+    [javax.servlet/servlet-api "2.5"]
+
+    [ring/ring-devel "1.1.8"]
   ]
-  
+
   :plugins [
     [lein-cljsbuild "1.1.1"]
     [lein-figwheel  "0.5.0-2"]
-    [lein-ring "0.9.7"]
   ]
-  
-  :aliases      { "package" ["do" 
+
+  :aliases      { "package" ["do"
                              "cljsbuild" "once" "advanced,"
                              "uberjar"] }
   :aot          [ qyu.server ]
   :uberjar-name "qyu.jar"
   :uberjar-exclusions [#"public/js/out"]
 
-  
-  :ring {:handler qyu.server/app
-         :auto-reload? true
-         :auto-refresh true}
 
   :main         qyu.server
   :figwheel     { :ring-handler  "qyu.server/app"
                   :css-dirs     ["resources/public"]
                   :server-port   8080
                   :repl          false }
-  
+
   :cljsbuild {
     :builds [
-      { :id           "none" 
+      { :id           "none"
         :source-paths ["src"]
         :figwheel     { :on-jsload      "qyu.app/refresh" }
         :compiler     { :optimizations  :none
@@ -48,8 +47,8 @@
                         :output-dir     "resources/public/js/out"
                         :source-map     true
                         :compiler-stats true } }
-             
-      { :id           "advanced" 
+
+      { :id           "advanced"
         :source-paths ["src"]
         :compiler     { :optimizations  :advanced
                         :main           qyu.app
