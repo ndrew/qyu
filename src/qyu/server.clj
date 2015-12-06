@@ -10,6 +10,11 @@
     [cognitect.transit :as t])
   (:gen-class))
 
+; TODO:
+; - Add session managment
+; - Add db data saving
+
+
 ; --- Transit utilities --------------------------------------------------------
 (defn read-transit-str [s]
   (-> s
@@ -39,27 +44,14 @@
             (println "Recieved:" message)
             (httpkit/send! chan (write-transit-str ["pong" message])))))))
   (compojure/GET "/" [] (response/resource-response "public/index.html"))
-  (compojure/GET "/update-links" [:as req] (response/response "It is ok."))
+  (compojure/POST "/update-links" {:as req} (do
+    (println (str "[DEBUG] Update links requested: " {:session req}))
+    (response/response "Updated")))
   (route/resources "/" {:root "public"}))
 
-; --- Session managment --------------------------------------------------------
-
-; (defn set-session-var [session]
-;   (if (:my-var session)
-;     {:body "Session variable already set"}
-;     {:body "Nothing in session, setting the var"
-;      :session (assoc session :my-var "foo")}))
-;
-; (defroutes sessiontest-routes
-;   (ANY "/" {session :session} (set-session-var session))
-;   (route/not-found "Page not found"))
-;
-; (def sessiontest-app
-;   (-> sessiontest-routes
-;       session/wrap-session))
-;
-; (defn start-server []
-;   (future (jetty/run-jetty (var sessiontest-app) {:port 8080})))
+(def app-with-session
+  (-> (site app)
+      session/wrap-session))
 
 ; --- Application config -------------------------------------------------------
 (def app-port 8080)
@@ -70,10 +62,6 @@
 
 (defn -main [& args] ;; entry point, lein run will pick up and start from here
   (let [handler (if (in-dev? args)
-                  (reload/wrap-reload (site #'app)) ;; only reload when dev
-                  (site app))]
+                  (reload/wrap-reload (site #'app-with-session)) ;; only reload when dev
+                  (site app-with-session))]
     (httpkit/run-server handler {:port app-port})))
-
-; (defn -main [& args]
-;   (println (str "Starting server at port " app-port))
-;   (httpkit/run-server #'app {:port app-port}))
