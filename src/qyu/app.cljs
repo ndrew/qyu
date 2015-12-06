@@ -35,8 +35,14 @@
 
 
 (defn ^:export refresh []
+  (println "Hello!")
+
   (s/send! "refreshed")
-  (swap! *state assoc :db (db/from-local-storage!))
+  
+  (swap! *state merge 
+    { :db (db/from-local-storage!)
+      :links (db/get-links)
+      })
 
   (render)   
   )
@@ -50,12 +56,12 @@
       (db/add-link {
         :url s
       })
-      ;(println s)
       ) 
     )
   ;
-
-  )
+  
+  (swap! *state assoc :links (db/get-links))
+)
 
 
 ;; keys
@@ -68,7 +74,7 @@
 (keys/register "g" #(print "ggg!"))
 (keys/register "shift+/" #(do
   (print "?????")
-  (swap! *state assoc :message "???" )
+  ;(swap! *state assoc :message "???" )
   ))
 )
 
@@ -84,6 +90,8 @@
       (= op "db") (do
         ;(println (db/from-serialized-db data))
         (swap! *state assoc :db (db/reset-db! (db/from-serialized-db data)))
+        (swap! *state assoc :links (db/get-links))
+
         )
       :else (do
         (swap! *state #(-> %
@@ -106,10 +114,6 @@
       (js/setTimeout #(db/persist db) 0))))
 
 
-;(db/listen! :render (fn [_] 
-;   (refresh)
-;  ))
-
 
 (add-watch *state :listener 
   (fn [key atom old-state new-state]
@@ -117,6 +121,7 @@
         (swap! atom dissoc :raw-links)
         (batch-add (:raw-links new-state))
         )
+
       (render)
   ))
 

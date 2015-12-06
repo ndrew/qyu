@@ -136,6 +136,13 @@ body {
 }
 
 
+.info {
+	padding: 0 1rem;
+}
+
+.debug {
+	margin-top: 6rem;
+}
 
 
 .footer {

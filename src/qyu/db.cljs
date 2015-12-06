@@ -99,26 +99,23 @@
             ;;(swap! history conj @conn)
             ))
 
+
 (defn clear-localstorage![] 
-  (js/localStorage.setItem "qyu/DB" nil)
-  (reset-db! (d/create-conn schema))
+  (js/localStorage.removeItem "qyu/DB")
+  
+  (let [db (d/create-conn schema)]
+    (reset-db! db)
+    @db)
 )
 
 
 
 (defn from-local-storage! []
-	(or
-    	(when-let [stored (js/localStorage.getItem "qyu/DB")]
-      		(let [stored-db (dt/read-transit-str stored)]
-            (reset-db! stored-db)        		
+	 (when-let [stored (js/localStorage.getItem "qyu/DB")]
+    (let [stored-db (dt/read-transit-str stored)]
+      (reset-db! stored-db)        		
             ))
-    (do
-
-    	;"adding local fixtures"
-    ;;(d/transact! conn u/fixtures)
-  ;;  )
-	)
-
+   
 	conn
 )
 
@@ -137,30 +134,4 @@
           :tags  (:qyu/tags entity)
         })
     )
-)
-
-
-
-
-
-
-
-
-
-;(println (:eavt @conn))
-
-;; query stuff
-
-#_(let [links (d/q '[:find ?e :where [?e :qyu/url _]] @conn)]
-    (doall 
-        (for [[eid] (->> links (sort-by first))
-                    :let [entity (d/entity @conn eid)]]
-        
-        (do 
-            (println entity)
-            (println (:qyu/url entity))
-            (println (:qyu/tags entity))
-            )
-    ))
-)
 )

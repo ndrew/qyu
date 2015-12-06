@@ -14,7 +14,7 @@
 (defn el [id] (js/document.getElementById id))
 
 
-(rum/defc header < rum/static [state]
+(rum/defc header [state]
   [:.toolbar 
       [:.logo "qyu"]
       [:ul 
@@ -37,9 +37,11 @@
             false
             )} "save db"]]
 
+
         [:li 
           [:button {:on-click (fn[] 
             (swap! state assoc :db (db/clear-localstorage!))
+            (swap! state assoc :links [])
 
             )} "clean local db"]]
 
@@ -73,6 +75,7 @@
 (rum/defc links [state]
 
     [:.app
+      [:h3 "Links"]
       (let [v (get @state :current-view :links)]
         (if (= :batch-add v)
           (batch-add state)
@@ -90,20 +93,16 @@
                   ;  )
                   } (if (str/blank? (:title %)) (:url %) (:title %)) ]
                 ]
-              ) (db/get-links))
+              ) (get @state :links []))
             )
-          ;[:.links
-          ;  [:.header "Today"]
-          ;  [:.link 
-          ;    [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
-          ;]
           )
           
         )
 
       
   ;;   
-      [:hr] 
+      ;[:hr]
+      [:h4.debug "debug-debug-debug-debug-debug-debug-debug"] 
         [:div "[" (:count @state) "] " (pr-str (:message @state)) ]
     ]
 )
@@ -112,7 +111,7 @@
 (rum/defc debug [state]
     [:.state {:key "state"} 
       (pr-str 
-        state
+        @state
         ;(dissoc state :db)
         )
     ]
@@ -123,12 +122,21 @@
   )
 
 (rum/defc app < rum/reactive [*state]
-  (let [state (rum/react *state)]
+  ;(let [state (rum/react *state)]
 
   [:.container 
     (header *state)
+
+    [:.info
+      [:p 
+        "qyu — is a datascript based tool for organizing (kinda) links in localstorage and on the server. Maybe in future it will work. Have fun %)"
+      ]
+
+    ]
+    
     (links *state)
-    (debug state)
+    (debug *state)
     (footer)
-    ])
+    ]
+    ;)
 )
