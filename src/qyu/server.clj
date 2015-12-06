@@ -7,7 +7,9 @@
     [ring.util.response :as response]
     [ring.middleware.session :as session]
     [ring.middleware.reload :as reload]
-    [cognitect.transit :as t])
+    [cognitect.transit :as t]
+    [me.raynes.fs :as fs]
+    )
   (:gen-class))
 
 ; TODO:
@@ -28,6 +30,34 @@
     (t/write (t/writer os :json) o)
     (String. (.toByteArray os) "UTF-8")))
 
+
+; --- Application config -------------------------------------------------------
+
+(def app-port 8080)
+(def app-db-path (if-let [p (System/getenv "QYU_DB")] p "db/"))
+(def app-db-dir (fs/file app-db-path))
+(def user "test")
+
+
+(defn handle-message[chan message]
+  (if-let [db (:db message)]
+    (do
+      (println "storing")
+      
+      (spit (str (.getAbsolutePath app-db-dir) "/" user ".edn") db)
+      
+      (httpkit/send! chan (write-transit-str ["pong" "saved"]))
+      ;(println db)
+      ;(println (pr-str (fs/list-dir app-db-dir)))
+    )
+    (do
+      (println "Recieved:" message)
+      (httpkit/send! chan (write-transit-str ["pong" message]))
+      )
+    ) 
+  )
+
+
 ; --- Application web endpoints (routes) ---------------------------------------
 (compojure/defroutes app
   (compojure/GET "/api/websocket" [:as req]
@@ -41,8 +71,12 @@
       (httpkit/on-receive chan
         (fn [payload]
           (let [message (read-transit-str payload)]
-            (println "Recieved:" message)
-            (httpkit/send! chan (write-transit-str ["pong" message])))))))
+              (handle-message chan message)         
+
+            )))))
+
+
+
   (compojure/GET "/" [] (response/resource-response "public/index.html"))
   (compojure/POST "/update-links" {:as req} (do
     (println (str "[DEBUG] Update links requested: " {:session req}))
@@ -53,14 +87,14 @@
   (-> (site app)
       session/wrap-session))
 
-; --- Application config -------------------------------------------------------
-(def app-port 8080)
-(def app-db-path "db/links")
 
 ; --- Application startup ------------------------------------------------------
 (defn in-dev? [_] true) ;; TODO read a config variable from command line, env, or file?
 
 (defn -main [& args] ;; entry point, lein run will pick up and start from here
+
+  (println (str "working with " app-db-path))
+
   (let [handler (if (in-dev? args)
                   (reload/wrap-reload (site #'app-with-session)) ;; only reload when dev
                   (site app-with-session))]

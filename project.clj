@@ -14,6 +14,7 @@
     [javax.servlet/servlet-api "2.5"]
 
     [ring/ring-devel "1.1.8"]
+    [me.raynes/fs "1.4.6"]
   ]
 
   :plugins [
