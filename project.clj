@@ -15,6 +15,7 @@
   :plugins [
     [lein-cljsbuild "1.1.1"]
     [lein-figwheel  "0.5.0-2"]
+    [lein-ring "0.9.7"]
   ]
   
   :aliases      { "package" ["do" 
@@ -25,6 +26,10 @@
   :uberjar-exclusions [#"public/js/out"]
 
   
+  :ring {:handler qyu.server/app
+         :auto-reload? true
+         :auto-refresh true}
+
   :main         qyu.server
   :figwheel     { :ring-handler  "qyu.server/app"
                   :css-dirs     ["resources/public"]
