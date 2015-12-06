@@ -33,7 +33,7 @@
 
 ; --- Application config -------------------------------------------------------
 
-(def app-port 8080)
+(def app-port 80)
 (def app-db-path (if-let [p (System/getenv "QYU_DB")] p "db/"))
 (def app-db-dir (fs/file app-db-path))
 (def user "test")
