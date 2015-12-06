@@ -11,6 +11,9 @@
     ))
 
 
+(defn el [id] (js/document.getElementById id))
+
+
 (rum/defc header < rum/static [state]
   [:.toolbar 
       [:.logo "qyu"]
@@ -34,22 +37,61 @@
             false
             )} "save db"]]
 
+        [:li 
+          [:button {:on-click (fn[] 
+            
 
+            (swap! state assoc :db (db/clear-localstorage!))
+
+            )} "clean local db"]]
+
+
+        [:li 
+          [:button {:on-click (fn[] 
+            (swap! state assoc :current-view :batch-add)
+            )} "batch add"]]
         ]
     ]
   )
 
+(rum/defc batch-add [state]
+  [:.batch-add
+    [:header 
+      [:button {:on-click (fn[]
+        (let [raw-links (.-value (el "batch-links"))]
+          (swap! state merge 
+              {:raw-links raw-links
+               :current-view :links})
+
+          )
+        )} "Add"]
+      [:h3 "Add links (in batch)"]
+      ]
+    [:textarea#batch-links]
+    
+          ]
+  )
 
 (rum/defc links [state]
-      [:.app
-      [:.links
-        [:.header "Today"]
-        [:.link 
-          [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
-      ]
+    [:.app
+      
+      (let [v (get @state :current-view :links)]
+        (if (= :batch-add v)
+          (batch-add state)
+
+          [:.links
+            [:.header "Today"]
+            [:.link 
+              [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
+          ]
+          )
+          
+        )
+
+      
   ;;   
-    [:hr] 
-      [:div "[" (:count state) "] " (pr-str (:message state)) ]
+      [:hr] 
+        [:div "[" (:count @state) "] " (pr-str (:message @state)) ]
     ]
 )
 
@@ -71,8 +113,8 @@
   (let [state (rum/react *state)]
 
   [:.container 
-    (header state)
-    (links state)
+    (header *state)
+    (links *state)
     (debug state)
     (footer)
     ])

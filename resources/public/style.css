@@ -113,11 +113,30 @@ body {
 }
 
 
+.app .batch-add h3 {
+	display: inline-block;
+}
+
+.app .batch-add button {
+	margin-top: 1rem;
+	float: right;
+}
+
+
+.app .batch-add textarea {
+	min-height: 16rem;
+	width: 100%;
+}
+
+
 .state {
 	padding-left: 2rem;
 	font-style: .1rem;
 	opacity: .15;
 }
+
+
+
 
 .footer {
 

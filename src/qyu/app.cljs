@@ -30,6 +30,38 @@
 
 
 
+(defn render[] 
+  (rum/mount (ui/app *state) (js/document.querySelector "#app")))
+
+
+(defn ^:export refresh []
+  (s/send! "refreshed")
+  (swap! *state assoc :db (db/from-local-storage!))
+
+  (render)   
+  )
+
+;;
+;; controller
+
+(defn batch-add [raw-links]
+  (doseq [s (str/split-lines raw-links)]
+    (when-not (str/blank? s)
+      (db/add-link {
+        :url s
+      })
+      ;(println s)
+      ) 
+    )
+  ;
+
+  )
+
+
+;; keys
+
+(keys/register "ctrl+a" #(swap! *state assoc :current-view :batch-add))
+
 
 (comment 
 (keys/register "ctrl+enter" #(print "HELP!"))
@@ -39,17 +71,6 @@
   (swap! *state assoc :message "???" )
   ))
 )
-
-
-
-(defn ^:export refresh []
-  
-  (s/send! "refreshed")
-
-  (swap! *state assoc :db (db/from-local-storage!))
-    
-  (rum/mount (ui/app *state) (js/document.querySelector "#app")))
-
 
 
 ;; init sockets
@@ -62,8 +83,6 @@
     (cond 
       (= op "db") (do
         ;(println (db/from-serialized-db data))
-
-        
         (swap! *state assoc :db (db/reset-db! (db/from-serialized-db data)))
         )
       :else (do
@@ -87,5 +106,17 @@
       (js/setTimeout #(db/persist db) 0))))
 
 
-(db/listen! :render (fn [_] 
-  (refresh)))
+;(db/listen! :render (fn [_] 
+;   (refresh)
+;  ))
+
+
+(add-watch *state :listener 
+  (fn [key atom old-state new-state]
+      (when (:raw-links new-state)
+        (swap! atom dissoc :raw-links)
+        (batch-add (:raw-links new-state))
+        )
+      (render)
+  ))
+

@@ -48,6 +48,7 @@
 
 
 
+
 ;; persisting DB between page reloads
 (defn persist [db]
   (js/localStorage.setItem "qyu/DB" (dt/write-transit-str db)))
@@ -71,17 +72,23 @@
   ])
 
 
-(defn preload-db! []
-  (doseq [link canned-data]
-     ;; form entity
-        (let [entity (->> {
+(defn add-link
+  ([link]
+    (add-link conn link))
+  ([db link]
+    (let [entity (->> {
                 :qyu/url   (:url link)
                 :qyu/tags  (:tags link)
                 :qyu/title (:title link)
-                } (remove-vals nil?))
-            ]
-            (d/transact! conn [entity])
+                } (remove-vals nil?))]
+            (d/transact! db [entity])
             )
+  ))
+
+(defn preload-db! []
+  (doseq [link canned-data]
+     ;; form entity
+        
         )
 
   )
@@ -91,6 +98,12 @@
             (reset! conn stored-db)
             ;;(swap! history conj @conn)
             ))
+
+(defn clear-localstorage![] 
+  (js/localStorage.setItem "qyu/DB" nil)
+  (reset-db! (d/create-conn schema))
+)
+
 
 
 (defn from-local-storage! []
