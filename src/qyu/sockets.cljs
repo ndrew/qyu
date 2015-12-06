@@ -11,17 +11,23 @@
   (t/write (t/writer :json ) o))
 
 
-(defn socket [url onopen onmessage]
-  (doto (js/WebSocket. url)
-    (aset "onmessage" 
-		(fn [payload]
-        	(let [message (read-transit-str (.-data payload))]
-        		(onmessage message))))
-    (aset "onopen" onopen))
+(defonce api-url (str "ws://" js/location.host "/api/websocket"))
+
+(defonce socket (js/WebSocket. api-url))
+
+(defn on-open! [cb]
+  (doto socket
+    (aset "onopen" cb))
   )
 
+(defn on-msg! [cb]
+  (doto socket
+    (aset "onmessage" (fn [payload]
+          (let [message (read-transit-str (.-data payload))]
+            (cb message))))))
 
-(defn send! [socket message]
+
+(defn send! [message]
   (when (== 1 (.-readyState socket)) ;; WS_OPEN
     (.send socket (write-transit-str message))))
 

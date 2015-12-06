@@ -18,30 +18,17 @@
 
 (enable-console-print!)
 
-(defonce api-url (str "ws://" js/location.host "/api/websocket"))
 
 (defonce *state (atom { 
   :db db/conn
+
+  :logged-in false
 
   :count 0
   :message "Hello, world!"
                          }))
 
 
-(declare socket)
-
-(defn on-socket-open[] 
-  (s/send! socket "connected"))
-
-
-(defn on-socket-msg[message] 
-  (swap! *state #(-> %
-          (update :count inc)
-          (assoc :message message)))) 
-
-
-(defonce socket (s/socket api-url on-socket-open on-socket-msg))
-      
 
 
 (comment 
@@ -56,11 +43,30 @@
 
 
 (defn ^:export refresh []
-  (s/send! socket "refreshed")
+  
+  (s/send! "refreshed")
 
   (swap! *state assoc :db (db/from-local-storage!))
   
   (rum/mount (ui/app *state) (js/document.querySelector "#app")))
+
+
+;; init sockets
+
+(defn on-socket-open[] 
+  (s/send! "connected"))
+
+(defn on-socket-msg[message] 
+  
+
+  (swap! *state #(-> %
+          (update :count inc)
+          (assoc :message message)))) 
+
+(s/on-open! on-socket-open)
+(s/on-msg! on-socket-msg)
+
+;; init listeners 
 
 (db/listen! :persistence
   (fn [tx-report] ;; FIXME do not notify with nil as db-report

@@ -11,16 +11,33 @@
     ))
 
 
-
-(rum/defc header [state]
-  [:.toolbar
+(rum/defc header < rum/static [state]
+  [:.toolbar 
       [:.logo "qyu"]
       [:ul 
-        [:li.search {:key "search"} [:input {:type "search"}]]
-        [:li        {:key "btns"} [:button "?"]]
+        ;[:li.search [:input {:type "search"}]]
+        
+        [:li 
+          [:button {:on-click (fn[] 
+            
+            
+            false
+            )} "load db"]]
+
+
+        [:li 
+          [:button {:on-click (fn[] 
+            (let [serialized (db/get-serialized-db)]
+              (s/send! {:db serialized})
+              )
+            false
+            )} "save db"]]
+
+
         ]
     ]
   )
+
 
 (rum/defc links [state]
       [:.app
