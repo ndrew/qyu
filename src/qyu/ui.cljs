@@ -39,8 +39,6 @@
 
         [:li 
           [:button {:on-click (fn[] 
-            
-
             (swap! state assoc :db (db/clear-localstorage!))
 
             )} "clean local db"]]
@@ -73,17 +71,32 @@
   )
 
 (rum/defc links [state]
+
     [:.app
-      
       (let [v (get @state :current-view :links)]
         (if (= :batch-add v)
           (batch-add state)
 
-          [:.links
-            [:.header "Today"]
-            [:.link 
-              [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
-          ]
+          (into [:.links]
+            (map #(do
+              [:.link
+                [:a {
+                  :href (:url %)
+
+                  :target "blank"
+                  ;:on-click (fn[e]
+                  ;  (println e)
+                  ;  (.preventDefault e)
+                  ;  )
+                  } (if (str/blank? (:title %)) (:url %) (:title %)) ]
+                ]
+              ) (db/get-links))
+            )
+          ;[:.links
+          ;  [:.header "Today"]
+          ;  [:.link 
+          ;    [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
+          ;]
           )
           
         )

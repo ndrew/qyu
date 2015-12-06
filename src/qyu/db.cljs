@@ -124,7 +124,20 @@
 
 
 
-;; add stuff
+;; queries
+
+(defn get-links[] 
+  (let [links (d/q '[:find ?e :where [?e :qyu/url _]] @conn)]
+      (for [[eid] (->> links (sort-by first))
+                    :let [entity (d/entity @conn eid)]]
+        
+        {
+          :url   (:qyu/url entity)
+          :title (:qyu/title entity)
+          :tags  (:qyu/tags entity)
+        })
+    )
+)
 
 
 
