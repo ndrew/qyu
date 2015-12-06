@@ -42,6 +42,11 @@
 	(dt/write-transit-str @conn)
 )
 
+(defn from-serialized-db[s]
+  (dt/read-transit-str s)
+)
+
+
 
 ;; persisting DB between page reloads
 (defn persist [db]
@@ -66,27 +71,35 @@
   ])
 
 
+(defn preload-db! []
+  (doseq [link canned-data]
+     ;; form entity
+        (let [entity (->> {
+                :qyu/url   (:url link)
+                :qyu/tags  (:tags link)
+                :qyu/title (:title link)
+                } (remove-vals nil?))
+            ]
+            (d/transact! conn [entity])
+            )
+        )
+
+  )
+
+(defn reset-db! [stored-db]
+  (when (= (:schema stored-db) schema) ;; check for code update
+            (reset! conn stored-db)
+            ;;(swap! history conj @conn)
+            ))
+
+
 (defn from-local-storage! []
 	(or
     	(when-let [stored (js/localStorage.getItem "qyu/DB")]
       		(let [stored-db (dt/read-transit-str stored)]
-        		(when (= (:schema stored-db) schema) ;; check for code update
-					(reset! conn stored-db)
-		  			;;(swap! history conj @conn)
-			        true
-	          )))
+            (reset-db! stored-db)        		
+            ))
     (do
-		#_(doseq [link canned-data]
-		 ;; form entity
-		    (let [entity (->> {
-		            :qyu/url   (:url link)
-		            :qyu/tags  (:tags link)
-		            :qyu/title (:title link)
-		            } (remove-vals nil?))
-		        ]
-		        (d/transact! conn [entity])
-		        )
-		    )
 
     	;"adding local fixtures"
     ;;(d/transact! conn u/fixtures)

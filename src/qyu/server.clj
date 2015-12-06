@@ -40,21 +40,31 @@
 
 
 (defn handle-message[chan message]
-  (if-let [db (:db message)]
-    (do
-      (println "storing")
-      
-      (spit (str (.getAbsolutePath app-db-dir) "/" user ".edn") db)
-      
-      (httpkit/send! chan (write-transit-str ["pong" "saved"]))
-      ;(println db)
-      ;(println (pr-str (fs/list-dir app-db-dir)))
-    )
-    (do
-      (println "Recieved:" message)
-      (httpkit/send! chan (write-transit-str ["pong" message]))
+  (let [user-db-file (str (.getAbsolutePath app-db-dir) "/" user ".edn")]
+    (if-let [db (:db message)]
+      (do
+        (println "storing")
+        
+        (spit user-db-file db)
+        
+        (httpkit/send! chan (write-transit-str ["pong" "saved"]))
+        ;(println db)
+        ;(println (pr-str (fs/list-dir app-db-dir)))
       )
-    ) 
+      (if (:load-db message)
+        (let [db (slurp user-db-file)] 
+
+          (httpkit/send! chan (write-transit-str ["db" db]))
+          )
+        (do
+          (println "Recieved:" message)
+          (httpkit/send! chan (write-transit-str ["pong" message]))
+          )
+        ) 
+      
+      ) 
+    )
+
   )
 
 

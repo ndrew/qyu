@@ -47,8 +47,9 @@
   (s/send! "refreshed")
 
   (swap! *state assoc :db (db/from-local-storage!))
-  
+    
   (rum/mount (ui/app *state) (js/document.querySelector "#app")))
+
 
 
 ;; init sockets
@@ -57,11 +58,22 @@
   (s/send! "connected"))
 
 (defn on-socket-msg[message] 
-  
+  (let [[op data] message]
+    (cond 
+      (= op "db") (do
+        ;(println (db/from-serialized-db data))
 
-  (swap! *state #(-> %
+        
+        (swap! *state assoc :db (db/reset-db! (db/from-serialized-db data)))
+        )
+      :else (do
+        (swap! *state #(-> %
           (update :count inc)
-          (assoc :message message)))) 
+          (assoc :message data)))
+        ) 
+      )
+    )
+  ) 
 
 (s/on-open! on-socket-open)
 (s/on-msg! on-socket-msg)

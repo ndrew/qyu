@@ -19,8 +19,9 @@
         
         [:li 
           [:button {:on-click (fn[] 
-            
-            
+            ;(db/preload-db!)            
+            (s/send! {:load-db true})
+
             false
             )} "load db"]]
 
@@ -55,7 +56,10 @@
 
 (rum/defc debug [state]
     [:.state {:key "state"} 
-      (pr-str (dissoc state :db))
+      (pr-str 
+        state
+        ;(dissoc state :db)
+        )
     ]
 )
 
