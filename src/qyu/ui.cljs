@@ -11,6 +11,7 @@
     ))
 
 
+
 (rum/defc app < rum/reactive [*state]
   (let [state (rum/react *state)]
 
@@ -24,7 +25,7 @@
         ]
     ]
 
-    [:.state 
+    [:.state {:key "state"} 
       (pr-str (dissoc state :db))
     ]
 
@@ -42,5 +43,7 @@
 
     [:p "Authors: ndrew, aigor"]
 
-    ]])
+    ]
+
+    ])
 )

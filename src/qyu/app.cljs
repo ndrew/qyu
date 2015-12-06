@@ -13,16 +13,36 @@
     [datascript.transit :as dt]
 
     [clojure.set :as set]
-    [clojure.string :as str]
-    ))
-
-
-(defonce *state (atom { :count 0
-                        :message "Hello, world!"
-                        :db db/conn
-                         }))
+    [clojure.string :as str])
+  )
 
 (enable-console-print!)
+
+(defonce api-url (str "ws://" js/location.host "/api/websocket"))
+
+(defonce *state (atom { 
+  :db db/conn
+
+  :count 0
+  :message "Hello, world!"
+                         }))
+
+
+(declare socket)
+
+(defn on-socket-open[] 
+  (s/send! socket "connected"))
+
+
+(defn on-socket-msg[message] 
+  (swap! *state #(-> %
+          (update :count inc)
+          (assoc :message message)))) 
+
+
+(defonce socket (s/socket api-url on-socket-open on-socket-msg))
+      
+
 
 (comment 
 (keys/register "ctrl+enter" #(print "HELP!"))
@@ -38,10 +58,12 @@
 
 
 (defn ^:export refresh []
-  (s/send! "refreshed")
+  (s/send! socket "refreshed")
+
+  (swap! *state assoc :db (db/from-local-storage!))
   
   (rum/mount (ui/app *state) (js/document.querySelector "#app"))
-  (swap! *state assoc :db (db/from-local-storage!))
+
 )
 
 

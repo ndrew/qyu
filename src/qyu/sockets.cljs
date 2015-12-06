@@ -11,24 +11,17 @@
   (t/write (t/writer :json ) o))
 
 
-(declare send!)
+(defn socket [url onopen onmessage]
+  (doto (js/WebSocket. url)
+    (aset "onmessage" 
+		(fn [payload]
+        	(let [message (read-transit-str (.-data payload))]
+        		(onmessage message))))
+    (aset "onopen" onopen))
+  )
 
 
-(defonce socket
-  (doto (js/WebSocket. (str "ws://" js/location.host "/api/websocket"))
-    (aset "onmessage"
-      (fn [payload]
-        (let [message (read-transit-str (.-data payload))]
-          ;(swap! *state #(-> %
-          ;                 (update :count inc)
-          ;                 (assoc :message message)))
-
-          )))
-    (aset "onopen"
-      #(send! "connected"))))
-
-
-(defn send! [message]
+(defn send! [socket message]
   (when (== 1 (.-readyState socket)) ;; WS_OPEN
     (.send socket (write-transit-str message))))
 
