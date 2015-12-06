@@ -12,38 +12,47 @@
 
 
 
-(rum/defc app < rum/reactive [*state]
-  (let [state (rum/react *state)]
-
-  [:.container 
-    [:.toolbar
+(rum/defc header [state]
+  [:.toolbar
       [:.logo "qyu"]
-
       [:ul 
-        [:li.search [:input {:type "search"}]]
-        [:li [:button "?"]]
+        [:li.search {:key "search"} [:input {:type "search"}]]
+        [:li        {:key "btns"} [:button "?"]]
         ]
     ]
+  )
 
-    [:.state {:key "state"} 
-      (pr-str (dissoc state :db))
-    ]
-
-    [:.app
+(rum/defc links [state]
+      [:.app
       [:.links
         [:.header "Today"]
         [:.link 
           [:a {:href "#"} "A sample link!"] [:span.status "opened 1 day ago"] ]
       ]
-
   ;;   
-     [:hr] 
+    [:hr] 
       [:div "[" (:count state) "] " (pr-str (:message state)) ]
-
-
-    [:p "Authors: ndrew, aigor"]
-
     ]
+)
 
+
+(rum/defc debug [state]
+    [:.state {:key "state"} 
+      (pr-str (dissoc state :db))
+    ]
+)
+
+(rum/defc footer < rum/static [] 
+  [:p.footer "Authors: ndrew, aigor"]
+  )
+
+(rum/defc app < rum/reactive [*state]
+  (let [state (rum/react *state)]
+
+  [:.container 
+    (header state)
+    (links state)
+    (debug state)
+    (footer)
     ])
 )

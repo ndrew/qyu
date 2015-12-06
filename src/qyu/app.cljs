@@ -53,8 +53,6 @@
   ))
 )
 
-;; ui 
-
 
 
 (defn ^:export refresh []
@@ -62,10 +60,7 @@
 
   (swap! *state assoc :db (db/from-local-storage!))
   
-  (rum/mount (ui/app *state) (js/document.querySelector "#app"))
-
-)
-
+  (rum/mount (ui/app *state) (js/document.querySelector "#app")))
 
 (db/listen! :persistence
   (fn [tx-report] ;; FIXME do not notify with nil as db-report
@@ -75,6 +70,4 @@
 
 
 (db/listen! :render (fn [_] 
-    (refresh)))
-
-
+  (refresh)))

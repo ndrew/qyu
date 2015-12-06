@@ -5,12 +5,17 @@
   -webkit-box-sizing: border-box;
 }
 
+html {
+	position: relative;
+    min-height: 100%;
+}
+
 html, textarea, button {
   font: 12px/20px Consolas, 'Menlo', monospace;
 }
 
 body {
-	margin: 0; padding: 0;
+	margin: 0 0 2rem; padding: 0;
 }
 
 .toolbar {
@@ -109,8 +114,22 @@ body {
 
 
 .state {
-	
 	padding-left: 2rem;
 	font-style: .1rem;
 	opacity: .15;
+}
+
+.footer {
+
+	text-align: right;
+
+	border-top: 1px solid rgba(128,128,128,0.25);
+	padding-top: .5rem;
+	padding-right: 1rem;
+
+	position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2rem;
+    width: 100%;
 }
